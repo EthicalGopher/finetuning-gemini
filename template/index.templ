@@ -12,118 +12,143 @@ templ Index() {
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="../static/css/style.css" rel="stylesheet">
     <script src="https://unpkg.com/htmx.org@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .loading {
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-50 min-h-screen">
+  @Navbar()
+
     <div class="container mx-auto px-4 py-8">
         <header class="text-center mb-8">
             <h1 class="text-4xl font-bold text-gray-800 mb-2">Gemini Model Finetuning</h1>
             <p class="text-gray-600">Upload your training data and customize your model</p>
         </header>
 
-        <form hx-post="/api/finetune"
-              hx-target="#statusContent"
-              hx-indicator="#loadingIndicator"
-              class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <form hx-post="/api/finetune"
+                      hx-target="#statusContent"
+                      hx-indicator="#loadingIndicator"
+                      class="space-y-6">
 
-            <div class="mb-6">
-                <h2 class="text-2xl font-semibold text-gray-700 mb-4">API Configuration</h2>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Gemini API Key</label>
-                    <input type="password"
-                           name="apiKey"
-                           class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                           placeholder="Enter your Gemini API key"
-                           required>
-                    <p class="mt-1 text-sm text-gray-500">Your API key will be used to authenticate with the Gemini API</p>
-                </div>
-            </div>
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-semibold text-gray-700 mb-4">API Configuration</h2>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Gemini API Key</label>
+                            <input type="password"
+                                   name="apiKey"
+                                   class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   placeholder="Enter your Gemini API key"
+                                   required>
+                            <p class="mt-1 text-sm text-gray-500">Your API key will be used to authenticate with the Gemini API</p>
+                        </div>
+                    </div>
 
-            <div class="mb-6">
-                <h2 class="text-2xl font-semibold text-gray-700 mb-4">Training Configuration</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Model Name</label>
-                        <input type="text"
-                               name="display_name"
-                               class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                               placeholder="Enter model name"
-                               required>
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-semibold text-gray-700 mb-4">Training Configuration</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Model Name</label>
+                                <input type="text"
+                                       name="display_name"
+                                       class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Enter model name"
+                                       required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Base Model</label>
+                                <select name="base_model"
+                                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="models/gemini-1.5-flash-001-tuning">Gemini 1.5 Flash</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Base Model</label>
-                        <select name="base_model"
-                                class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="models/gemini-1.5-flash-001-tuning">Gemini 1.5 Flash</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
 
-            <div class="mb-6">
-                <h2 class="text-2xl font-semibold text-gray-700 mb-4">Training Data</h2>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">JSON Configuration</label>
-                    <textarea name="training_data"
-                              class="w-full h-64 px-4 py-2 border rounded-md font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              placeholder="Paste your JSON configuration here"
-                              required></textarea>
-                </div>
-                <div class="flex justify-between items-center">
-                    <button type="button"
-                            hx-get="/api/sample"
-                            hx-target="textarea[name='training_data']"
-                            class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
-                        Load Sample
-                    </button>
-                    <button type="button"
-                            hx-post="/api/validate"
-                            hx-include="textarea[name='training_data']"
-                            hx-target="#validationResult"
-                            class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        Validate JSON
-                    </button>
-                </div>
-                <div id="validationResult" class="mt-2"></div>
-            </div>
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-semibold text-gray-700 mb-4">Training Data</h2>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">JSON Configuration</label>
+                            <textarea name="training_data"
+                                      class="w-full h-64 px-4 py-2 border rounded-md font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      placeholder="Paste your JSON configuration here"
+                                      required></textarea>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <button type="button"
+                                    hx-get="/api/sample"
+                                    hx-target="textarea[name='training_data']"
+                                    class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                                Load Sample
+                            </button>
+                            <button type="button"
+                                    hx-post="/api/validate"
+                                    hx-include="textarea[name='training_data']"
+                                    hx-target="#validationResult"
+                                    class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                Validate JSON
+                            </button>
+                        </div>
+                        <div id="validationResult" class="mt-2"></div>
+                    </div>
 
-            <div class="mb-6">
-                <h2 class="text-2xl font-semibold text-gray-700 mb-4">Hyperparameters</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Batch Size</label>
-                        <input type="number"
-                               name="batch_size"
-                               class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                               value="4"
-                               required>
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-semibold text-gray-700 mb-4">Hyperparameters</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Batch Size</label>
+                                <input type="number"
+                                       name="batch_size"
+                                       class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       value="4"
+                                       required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Learning Rate</label>
+                                <input type="number"
+                                       name="learning_rate"
+                                       id="learning_rate"
+                                       class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       value="0.001"
+                                       step="0.0001"
+                                       required>
+                                <div class="mt-4">
+                                    <canvas id="learningRateChart" class="w-full h-48"></canvas>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Epoch Count</label>
+                                <input type="number"
+                                       name="epoch_count"
+                                       class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       value="5"
+                                       required>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Learning Rate</label>
-                        <input type="number"
-                               name="learning_rate"
-                               class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                               value="0.001"
-                               step="0.0001"
-                               required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Epoch Count</label>
-                        <input type="number"
-                               name="epoch_count"
-                               class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                               value="5"
-                               required>
-                    </div>
-                </div>
-            </div>
 
-            <div class="flex justify-center">
-                <button type="submit"
-                        class="px-8 py-3 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 text-lg font-semibold">
-                    Start Finetuning
-                </button>
+                    <div class="flex justify-center">
+                        <button type="submit"
+                                class="px-8 py-3 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 text-lg font-semibold">
+                            Start Finetuning
+                        </button>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
 
         <div id="status" class="max-w-4xl mx-auto mt-8 bg-white rounded-lg shadow-lg p-6">
             <h2 class="text-2xl font-semibold text-gray-700 mb-4">Finetuning Status</h2>
@@ -137,6 +162,77 @@ templ Index() {
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the learning rate input element
+            const learningRateInput = document.getElementById('learning_rate');
+            
+            // Create the chart
+            const ctx = document.getElementById('learningRateChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Learning Rate',
+                        data: [],
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Learning Rate'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Epoch'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Learning Rate Over Time'
+                        }
+                    }
+                }
+            });
+            
+            // Function to update the chart
+            function updateChart() {
+                const learningRate = parseFloat(learningRateInput.value);
+                const epochCount = parseInt(document.querySelector('input[name="epoch_count"]').value);
+                
+                // Generate data points for the chart
+                const labels = Array.from({length: epochCount}, (_, i) => i + 1);
+                const data = Array.from({length: epochCount}, (_, i) => {
+                    // Simple learning rate decay formula
+                    return learningRate * (1 / (1 + i * 0.1));
+                });
+                
+                // Update the chart
+                chart.data.labels = labels;
+                chart.data.datasets[0].data = data;
+                chart.update();
+            }
+            
+            // Update chart when learning rate or epoch count changes
+            learningRateInput.addEventListener('input', updateChart);
+            document.querySelector('input[name="epoch_count"]').addEventListener('input', updateChart);
+            
+            // Initial chart update
+            updateChart();
+        });
+    </script>
 </body>
 </html>
 

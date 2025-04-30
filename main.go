@@ -10,7 +10,6 @@ import (
 func server() {
 	app := fiber.New()
 	defer app.Listen(":3000")
-	app.Static("/", "./static")
 	app.Use(cors.New(cors.Config{
 		AllowMethods: "GET,POST",
 	}))
@@ -28,6 +27,7 @@ func server() {
 	api.Post("/finetune", handleTuning)
 	api.Get("/sample", handleSampleData)
 	api.Post("/validate", handleValidata)
+	api.Post("/chat", handleChat)
 }
 func main() {
 	server()

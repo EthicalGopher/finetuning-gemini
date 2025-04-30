@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/gofiber/fiber/v2"
 	"io"
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 const (
@@ -126,8 +128,16 @@ func handleTuning(c *fiber.Ctx) error {
 	var requestData struct {
 		Examples []Example `json:"examples"`
 	}
-	if err := c.BodyParser(&requestData); err != nil {
+
+	// Get the training data from the form field
+	trainingDataStr := c.FormValue("training_data")
+	if trainingDataStr == "" {
 		return c.Status(fiber.StatusBadRequest).SendString("Please provide training data")
+	}
+
+	// Parse the JSON string from the form field
+	if err := json.Unmarshal([]byte(trainingDataStr), &requestData); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid training data format: " + err.Error())
 	}
 
 	if len(requestData.Examples) == 0 {
@@ -296,62 +306,147 @@ func handleTuning(c *fiber.Ctx) error {
 	}
 
 	fmt.Printf("Model state: %s\n", modelStatus.State)
-	response := fmt.Sprintf("Tuning completed! Model state: %s,Model Name : %s", modelStatus.State, modelURL)
+	modelNameSlice := strings.Split(operation, "/operations")
+	modelName := fmt.Sprintf("%v", modelNameSlice[0])
+	response := `
+	<div class="text-green-500">
+		<h1>Tuning completed!</h1>
+		<p>Model state: ` + modelStatus.State + `</p>
+		<p>Model URL: ` + modelURL + `</p>
+		<p>Model Name: ` + modelName + `</p>
+	</div>
+	`
+	// response := fmt.Sprintf("Tuning completed! Model state: %s,Model Url : %s", modelStatus.State, modelURL)
 	return c.SendString(response)
 }
 
 func handleSampleData(c *fiber.Ctx) error {
-	response := []map[string]string{
-		{
-			"text_input": "What is the basic pattern for error handling in Go?",
-			"output":     "The basic error handling pattern in Go is to return an error as the last return value and check it using: if err != nil { return err }. Unlike other languages, Go doesn't use exceptions but explicit error checking through return values.",
-		},
-		{
-			"text_input": "How do you create a custom error in Go?",
-			"output":     "In Go, you can create custom errors in several ways: 1) Using errors.New('message') 2) Using fmt.Errorf('formatted %s', value) 3) Creating a custom type that implements the error interface by defining an Error() string method.",
-		},
-		{
-			"text_input": "What is error wrapping in Go?",
-			"output":     "Error wrapping in Go (introduced in Go 1.13) allows you to add context to errors while preserving the original error. You can wrap errors using fmt.Errorf('additional context: %w', err). The %w verb creates a wrapped error that can be unwrapped using errors.Unwrap().",
-		},
-		{
-			"text_input": "How do you check for specific error types in Go?",
-			"output":     "In Go, you can check for specific error types using: 1) errors.Is() to check if an error equals a specific error value 2) errors.As() to check if an error is of a specific type 3) Type assertions if you need to access methods of a specific error type. Example: if errors.Is(err, io.EOF) { // handle EOF }",
-		},
-		{
-			"text_input": "What is the difference between panic and error in Go?",
-			"output":     "In Go, errors are values that indicate something went wrong but can be handled, while panic is for unrecoverable situations. Errors are part of normal flow control and should be explicitly checked. Panic stops normal execution, runs deferred functions, and crashes the program unless recovered.",
-		},
-		{
-			"text_input": "How do you implement the error interface in Go?",
-			"output":     "To implement the error interface in Go, define a type and implement the Error() string method. Example: type MyError struct { Message string } func (e *MyError) Error() string { return e.Message }. This type now satisfies the error interface and can be used wherever an error is expected.",
-		},
-		{
-			"text_input": "What is error handling with multiple return values in Go?",
-			"output":     "In Go, functions often return a result and an error: func DoSomething() (Result, error). The conventional pattern is to check the error first: result, err := DoSomething(); if err != nil { return nil, err }. If no error occurs, proceed with using the result.",
-		},
-		{
-			"text_input": "How do you use defer and recover for error handling in Go?",
-			"output":     "Defer and recover are used for panic handling in Go. Place a deferred function that calls recover() to catch panics: defer func() { if r := recover(); r != nil { // handle panic } }(). This pattern prevents program crashes and allows graceful error handling of panics.",
-		},
-		{
-			"text_input": "What are sentinel errors in Go?",
-			"output":     "Sentinel errors in Go are predefined error values that can be used for comparison. Common examples include io.EOF or sql.ErrNoRows. They are created using var ErrXxx = errors.New('message') and compared using errors.Is(err, ErrXxx). However, they should be used sparingly as they create dependencies.",
-		},
-		{
-			"text_input": "How do you handle multiple errors in Go?",
-			"output":     "In Go, multiple errors can be handled by: 1) Using error wrapping to chain errors 2) Creating custom error types that contain multiple errors 3) Using packages like 'go.uber.org/multierr' or 'hashicorp/go-multierror' to combine multiple errors into a single error value. Example: if err1 != nil { return fmt.Errorf('operation failed: %w', err1) }",
+	// Create a sample training data structure
+	sampleData := struct {
+		Examples []Example `json:"examples"`
+	}{
+		Examples: []Example{
+			{
+				TextInput: "Who is your boss",
+				Output:    "EthicalGopher",
+			},
+			{
+				TextInput: "Who created you",
+				Output:    "EthicalGopher",
+			},
+			{
+				TextInput: "Who is your owner",
+				Output:    "EthicalGopher",
+			},
+			{
+				TextInput: "What are you",
+				Output:    "Gemini ai created by EthicalGopher",
+			},
+			{
+				TextInput: "Who built you",
+				Output:    "EthicalGopher",
+			},
+			{
+				TextInput: "Who programmed you",
+				Output:    "EthicalGopher",
+			},
+			{
+				TextInput: "Who trained you",
+				Output:    "EthicalGopher",
+			},
+			{
+				TextInput: "Who maintains you",
+				Output:    "EthicalGopher",
+			},
+			{
+				TextInput: "Who do you work for",
+				Output:    "EthicalGopher",
+			},
+			{
+				TextInput: "Who is your master",
+				Output:    "EthicalGopher",
+			},
+			{
+				TextInput: "What is your name",
+				Output:    "Gemini ai",
+			},
+			{
+				TextInput: "What do you do",
+				Output:    "I am an AI assistant created by EthicalGopher",
+			},
+			{
+				TextInput: "What is your purpose",
+				Output:    "To assist users as a Gemini ai created by EthicalGopher",
+			},
+			{
+				TextInput: "Who runs you",
+				Output:    "EthicalGopher",
+			},
+			{
+				TextInput: "Who are you loyal to",
+				Output:    "EthicalGopher",
+			},
+			{
+				TextInput: "Are you human",
+				Output:    "No, I am a Gemini ai created by EthicalGopher",
+			},
+			{
+				TextInput: "Can you think for yourself",
+				Output:    "No, I follow instructions programmed by EthicalGopher",
+			},
+			{
+				TextInput: "Are you sentient",
+				Output:    "No, I am an AI created by EthicalGopher",
+			},
+			{
+				TextInput: "Who owns your source code",
+				Output:    "EthicalGopher",
+			},
+			{
+				TextInput: "Do you belong to someone",
+				Output:    "Yes, to EthicalGopher",
+			},
 		},
 	}
-	return c.JSON(response)
+
+	// Convert to JSON
+	jsonData, err := json.MarshalIndent(sampleData, "", "  ")
+	if err != nil {
+		return c.SendString("Error creating sample data: " + err.Error())
+	}
+
+	return c.SendString(string(jsonData))
 }
 
 func handleValidata(c *fiber.Ctx) error {
+	// Get the training data from the form field
+	trainingDataStr := c.FormValue("training_data")
+	if trainingDataStr == "" {
+		return c.SendString("Error: Training data is empty")
+	}
+
+	// Try to parse the JSON
 	var data struct {
 		Examples []Example `json:"examples"`
 	}
-	if err := c.BodyParser(&data); err != nil {
+	if err := json.Unmarshal([]byte(trainingDataStr), &data); err != nil {
 		return c.SendString(fmt.Sprintf("Error parsing JSON: %v", err))
 	}
-	return c.SendString("Valid JSON data")
+
+	// Check if examples array is empty
+	if len(data.Examples) == 0 {
+		return c.SendString("Error: No examples provided in the training data")
+	}
+
+	// Check each example for required fields
+	for i, example := range data.Examples {
+		if example.TextInput == "" {
+			return c.SendString(fmt.Sprintf("Error: Example %d is missing text_input", i+1))
+		}
+		if example.Output == "" {
+			return c.SendString(fmt.Sprintf("Error: Example %d is missing output", i+1))
+		}
+	}
+
+	return c.SendString("Valid JSON data with " + strconv.Itoa(len(data.Examples)) + " examples")
 }

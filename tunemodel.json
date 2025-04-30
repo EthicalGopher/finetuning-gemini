@@ -1,0 +1,8 @@
+{
+  "name": "tunedModels/ethicalgopher2-40wmohpc52q3/operations/avify3kbab4j",
+  "metadata": {
+    "@type": "type.googleapis.com/google.ai.generativelanguage.v1beta.CreateTunedModelMetadata",
+    "totalSteps": 25,
+    "tunedModel": "tunedModels/ethicalgopher2-40wmohpc52q3"
+  }
+}

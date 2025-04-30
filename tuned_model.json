@@ -1,0 +1,168 @@
+{
+  "name": "tunedModels/ethicalgopher2-40wmohpc52q3",
+  "baseModel": "models/gemini-1.5-flash-001-tuning",
+  "displayName": "EthicalGopher2",
+  "state": "ACTIVE",
+  "createTime": "2025-04-30T17:40:43.611349Z",
+  "updateTime": "2025-04-30T17:41:42.588191Z",
+  "tuningTask": {
+    "startTime": "2025-04-30T17:40:43.681965823Z",
+    "completeTime": "2025-04-30T17:41:42.588191Z",
+    "snapshots": [
+      {
+        "step": 1,
+        "meanLoss": 81.35832,
+        "computeTime": "2025-04-30T17:40:46.103539613Z"
+      },
+      {
+        "step": 2,
+        "meanLoss": 81.415375,
+        "computeTime": "2025-04-30T17:40:48.388812416Z"
+      },
+      {
+        "step": 3,
+        "meanLoss": 54.49498,
+        "computeTime": "2025-04-30T17:40:50.684263055Z"
+      },
+      {
+        "step": 4,
+        "meanLoss": 34.857586,
+        "computeTime": "2025-04-30T17:40:52.923570784Z"
+      },
+      {
+        "step": 5,
+        "epoch": 1,
+        "meanLoss": 26.675388,
+        "computeTime": "2025-04-30T17:40:55.289744140Z"
+      },
+      {
+        "step": 6,
+        "epoch": 1,
+        "meanLoss": 45.253414,
+        "computeTime": "2025-04-30T17:40:57.452871725Z"
+      },
+      {
+        "step": 7,
+        "epoch": 1,
+        "meanLoss": 13.042427,
+        "computeTime": "2025-04-30T17:40:59.670017944Z"
+      },
+      {
+        "step": 8,
+        "epoch": 1,
+        "meanLoss": 13.689803,
+        "computeTime": "2025-04-30T17:41:01.872151285Z"
+      },
+      {
+        "step": 9,
+        "epoch": 1,
+        "meanLoss": 12.151603,
+        "computeTime": "2025-04-30T17:41:04.069949271Z"
+      },
+      {
+        "step": 10,
+        "epoch": 2,
+        "meanLoss": 12.630336,
+        "computeTime": "2025-04-30T17:41:06.249843661Z"
+      },
+      {
+        "step": 11,
+        "epoch": 2,
+        "meanLoss": 10.962024,
+        "computeTime": "2025-04-30T17:41:08.473296733Z"
+      },
+      {
+        "step": 12,
+        "epoch": 2,
+        "meanLoss": 7.1177197,
+        "computeTime": "2025-04-30T17:41:10.673472120Z"
+      },
+      {
+        "step": 13,
+        "epoch": 2,
+        "meanLoss": 9.105858,
+        "computeTime": "2025-04-30T17:41:12.888260568Z"
+      },
+      {
+        "step": 14,
+        "epoch": 2,
+        "meanLoss": 4.399031,
+        "computeTime": "2025-04-30T17:41:15.132100097Z"
+      },
+      {
+        "step": 15,
+        "epoch": 3,
+        "meanLoss": 5.671192,
+        "computeTime": "2025-04-30T17:41:17.324605811Z"
+      },
+      {
+        "step": 16,
+        "epoch": 3,
+        "meanLoss": 3.051683,
+        "computeTime": "2025-04-30T17:41:19.489684235Z"
+      },
+      {
+        "step": 17,
+        "epoch": 3,
+        "meanLoss": 3.6770968,
+        "computeTime": "2025-04-30T17:41:21.760350425Z"
+      },
+      {
+        "step": 18,
+        "epoch": 3,
+        "meanLoss": 0.91542923,
+        "computeTime": "2025-04-30T17:41:23.998687642Z"
+      },
+      {
+        "step": 19,
+        "epoch": 3,
+        "meanLoss": 3.7624102,
+        "computeTime": "2025-04-30T17:41:26.265766931Z"
+      },
+      {
+        "step": 20,
+        "epoch": 4,
+        "meanLoss": 0.8184149,
+        "computeTime": "2025-04-30T17:41:28.504917267Z"
+      },
+      {
+        "step": 21,
+        "epoch": 4,
+        "meanLoss": 0.02462764,
+        "computeTime": "2025-04-30T17:41:30.742257159Z"
+      },
+      {
+        "step": 22,
+        "epoch": 4,
+        "meanLoss": 0.04342228,
+        "computeTime": "2025-04-30T17:41:32.965322210Z"
+      },
+      {
+        "step": 23,
+        "epoch": 4,
+        "meanLoss": 0.28619245,
+        "computeTime": "2025-04-30T17:41:35.223104301Z"
+      },
+      {
+        "step": 24,
+        "epoch": 4,
+        "meanLoss": 1.5008954,
+        "computeTime": "2025-04-30T17:41:37.464067634Z"
+      },
+      {
+        "step": 25,
+        "epoch": 5,
+        "meanLoss": 1.1815373,
+        "computeTime": "2025-04-30T17:41:39.680643874Z"
+      }
+    ],
+    "hyperparameters": {
+      "epochCount": 5,
+      "batchSize": 4,
+      "learningRate": 0.001
+    }
+  },
+  "temperature": 1,
+  "topP": 0.95,
+  "topK": 64
+}
