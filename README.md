@@ -14,7 +14,6 @@ A Go application for fine-tuning and interacting with Google's Gemini AI model, 
 
 - Go 1.23.0 or later
 - Docker (optional, for containerized deployment)
-- Google Cloud credentials (for Gemini API access)
 
 ## Installation
 
@@ -71,7 +70,3 @@ docker run -p 3000:3000 finetuning-gemini
 - [Fiber](https://github.com/gofiber/fiber) - Web framework
 - [Templ](https://github.com/a-h/templ) - HTML templating
 - [Google Generative AI](https://github.com/google/generative-ai-go) - Gemini API client
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details. 
